@@ -115,7 +115,7 @@
     <div id="app">
         <header class="topbar">
             <div class="topbar__title">Каталог книг библиотеки им. Селянина</div>
-            <div class="topbar__subtitle" v-if="totalCount">{{totalCount}} {{1 | pluralize('книга,книги,книг')}}</div>
+            <div class="topbar__subtitle" v-if="totalCount">{{totalCount}} {{totalCount | pluralize('книга,книги,книг')}}</div>
         </header>
         <div class="list-page layout">
             <input type="search" v-model="query" class="search-field" placeholder="Напиши название книги или имя автора">
