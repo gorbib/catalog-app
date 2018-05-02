@@ -66,6 +66,11 @@
     .search-field::-webkit-input-placeholder {
         color: #86889e;
     }
+    .search-results-title {
+        padding: 20px;
+        font-weight: bold;
+        color: #403848;
+    }
     .books-list {
         display: flex;
         flex-direction: column;
@@ -83,6 +88,11 @@
         font-weight: bold;
         margin-bottom: 10px;
         color: #403848
+    }
+    .book__subtitle {
+        color: #9f9fb2;
+        font-size: 14px;
+        margin-bottom: 10px;
     }
     .book__author {
         color: #9f9fb2;
@@ -109,6 +119,12 @@
     .book mark {
         background-color: #eff1ff;
     }
+    .splashscreen {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        justify-content: center;
+    }
     </style>
 </head>
 <body>
@@ -117,18 +133,22 @@
             <div class="topbar__title">Каталог книг библиотеки им. Селянина</div>
             <div class="topbar__subtitle" v-if="totalCount">{{totalCount}} {{totalCount | pluralize('книга,книги,книг')}}</div>
         </header>
-        <div class="list-page layout">
+        <div class="layout">
             <input type="search" v-model="query" class="search-field" placeholder="Напиши название книги или имя автора">
+            <div class="search-results-title" v-if="resultsCount > 0">{{resultsCount | pluralize('Найдена,Найдены,Найдено')}} {{resultsCount}} {{resultsCount | pluralize('книга,книги,книг')}}</div>
             <div class="books-list">
                 <book :record="record" :query="query" v-for="record in records"></book>
             </div>
+            <div class="splashscreen" v-if="resultsCount == 0"><span>Книги не найдены</span></div>
         </div>
     </div>
 
     <template id="book">
         <div class="book" v-bind:class="{'book--expanded': expanded}" @click="expand">
             <div class="book__title" v-html="$options.filters.highlightMatches(record.title, query)"></div>
-            <div class="book__author" v-html="$options.filters.highlightMatches(record.author, query)"></div>
+            <div class="book__author" v-if="this.expanded" v-html="$options.filters.highlightMatches(record.author, query)"></div>
+            <div class="book__author" v-else v-html="$options.filters.highlightMatches(record.full_name, query)"></div>
+            <div class="book__subtitle" v-if="record.title_info">{{record.title_info}}</div>
             <div class="book__summary">{{record.summary}}</div>
             <div class="book__department">{{record.department}}</div>
         </div>
@@ -179,7 +199,11 @@
                     this.records = response.data.records;
                     
                     this.totalCount = response.data.total_total;
-                    this.resultsCount = this.records[0].total;
+                    if (typeof this.records[0] !== 'undefined') {
+                        this.resultsCount = this.records[0].total;
+                    } else {
+                        this.resultsCount = 0;
+                    } 
                 });
             }
         },
