@@ -225,6 +225,7 @@
         filters: {
             highlightMatches: function (string, searchTerm) {
                 if (!searchTerm) return string;
+                if (!string) return;
                 return string.replace(new RegExp("(" + searchTerm + ")", "ig"), "<mark>$1</mark>");
             }
         }
