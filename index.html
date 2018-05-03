@@ -54,8 +54,8 @@
     }
     .layout {
         overflow-y: scroll;
-        height: 100%;
         display: flex;
+        flex-grow: 1;
         flex-direction: column;
     }
     .search-field {
@@ -80,6 +80,7 @@
     .books-list {
         display: flex;
         flex-direction: column;
+        flex-shrink: 0;
     }
     .book {
         margin: 10px 20px;
@@ -137,6 +138,7 @@
         display: flex;
         align-items: center;
         flex-grow: 1;
+        flex-shrink: 0;
         justify-content: center;
     }
     </style>
