@@ -20,17 +20,24 @@
         padding: 0;
         overflow: hidden;
     }
+
+    :root {
+        --main-bg-color: #f5f6f9;
+        --block-bg-color: #fff;
+        --black-color: #3d3b48;
+    }
+
     #app {
         -webkit-font-smoothing: antialiased;
         display: flex;
         flex-direction: column;
         height: 100%;
         width: 100%;
-        background-color: #f5f6f9;
+        background-color: var(--main-bg-color);
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     }
     .topbar {
-        background-color: #fff;
+        background-color: var(--block-bg-color);
         text-align: center;
         padding: 20px;
         box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.05);
@@ -39,7 +46,7 @@
     }
     .topbar__title {
         font-weight: bold;
-        color: #403848;
+        color: var(--black-color);
     }
     .topbar__subtitle {
         margin-top: 5px;
@@ -69,7 +76,7 @@
     .search-results-title {
         padding: 20px;
         font-weight: bold;
-        color: #403848;
+        color: var(--black-color);
     }
     .books-list {
         display: flex;
@@ -78,7 +85,7 @@
     .book {
         margin: 10px 20px;
         padding: 20px;
-        background-color: #fff;
+        background-color: var(--block-bg-color);
         border-radius: 5px;
         border-left: 5px solid #8194fb;
         cursor: pointer;
@@ -87,7 +94,7 @@
         font-size: 16px;
         font-weight: bold;
         margin-bottom: 10px;
-        color: #403848
+        color: var(--black-color);
     }
     .book__subtitle {
         color: #9f9fb2;
@@ -112,14 +119,22 @@
         font-size: 14px;
         display: none;
     }
-    .book--expanded .book__summary,
-    .book--expanded .book__department {
+    .expands {
+        display: none;
+    }
+    .book--expanded .expands {
         display: block;
     }
     .book mark {
         background-color: #eff1ff;
     }
     .splashscreen {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        justify-content: center;
+    }
+    .preloader {
         display: flex;
         align-items: center;
         flex-grow: 1;
@@ -139,7 +154,23 @@
             <div class="books-list">
                 <book :record="record" :query="query" v-for="record in records"></book>
             </div>
-            <div class="splashscreen" v-if="resultsCount == 0"><span>Книги не найдены</span></div>
+            <div class="splashscreen" v-if="resultsCount == 0 && !loading"><span>Книги не найдены</span></div>
+            <div class="preloader" v-if="loading">
+                <svg width="120" height="30" xmlns="http://www.w3.org/2000/svg" fill="#8194fb">
+                    <circle cx="15" cy="15" r="15">
+                      <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite"/>
+                      <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="60" cy="15" r="9" fill-opacity=".3">
+                      <animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9" calcMode="linear" repeatCount="indefinite"/>
+                      <animate attributeName="fill-opacity" from=".5" to=".5" begin="0s" dur="0.8s" values=".5;1;.5" calcMode="linear" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="105" cy="15" r="15">
+                      <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite"/>
+                      <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite"/>
+                    </circle>
+                  </svg>
+            </div>
         </div>
     </div>
 
@@ -148,9 +179,9 @@
             <div class="book__title" v-html="$options.filters.highlightMatches(record.title, query)"></div>
             <div class="book__author" v-if="this.expanded" v-html="$options.filters.highlightMatches(record.author, query)"></div>
             <div class="book__author" v-else v-html="$options.filters.highlightMatches(record.full_name, query)"></div>
-            <div class="book__subtitle" v-if="record.title_info">{{record.title_info}}</div>
-            <div class="book__summary">{{record.summary}}</div>
-            <div class="book__department">{{record.department}}</div>
+            <div class="book__subtitle expands" v-if="record.title_info">{{record.title_info}}</div>
+            <div class="book__summary expands">{{record.summary}}</div>
+            <div class="book__department expands">{{record.department}}</div>
         </div>
     </template>
 </body>
@@ -185,7 +216,9 @@
                 source: '',
                 query:'',
                 resultsCount: 0,
-                totalCount: 0
+                totalCount: 0,
+                page: 1,
+                loading: false
             }
         },
         created: function () {
@@ -193,9 +226,11 @@
         },
         methods: {
             getRecords: function() {
+                this.loading = true;
 
-                this.$http.get('https://ec.gorbib.org.ru/records/getrecords' + (this.query ? '/body:' + encodeURI(this.query) : ''))
+                this.$http.get('https://ec.gorbib.org.ru/records/getrecords' + (this.query ? '/body:' + encodeURI(this.query) : '') + '/page:' + this.page)
                 .then(response => {
+                    this.loading = false;
                     this.records = response.data.records;
                     
                     this.totalCount = response.data.total_total;
@@ -209,6 +244,8 @@
         },
         watch: {
             query: function(val) {
+                this.records = [];
+                this.resultsCount = 0;
                 this.getRecords();
             }
         },
