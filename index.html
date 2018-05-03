@@ -24,6 +24,7 @@
         --main-bg-color: #f5f6f9;
         --block-bg-color: #fff;
         --black-color: #3d3b48;
+        --accent-color: #8194fb;
     }
 
     #app {
@@ -87,7 +88,7 @@
         padding: 20px;
         background-color: var(--block-bg-color);
         border-radius: 5px;
-        border-left: 5px solid #8194fb;
+        border-left: 5px solid var(--accent-color);
         cursor: pointer;
     }
     .book__title {
@@ -140,6 +141,21 @@
         flex-grow: 1;
         flex-shrink: 0;
         justify-content: center;
+        margin: 20px;
+    }
+    .load-more-button {
+        background-color: var(--block-bg-color);
+        cursor: pointer;
+        color: var(--accent-color);
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-bottom:2px solid var(--accent-color);
+        border-radius: 5px;
+        margin:20px;
+        padding: 20px;
+        flex-grow: 1;
+        flex-shrink: 0;
     }
     </style>
 </head>
@@ -172,6 +188,7 @@
                     </circle>
                   </svg>
             </div>
+            <button class="load-more-button" v-if="hasMorePages" @click="loadMore">Показать больше результатов</button>
         </div>
     </div>
 
@@ -219,7 +236,8 @@
                 resultsCount: 0,
                 totalCount: 0,
                 page: 1,
-                loading: false
+                loading: false,
+                recordsPerPage: 10 // API limit
             }
         },
         created: function () {
@@ -232,7 +250,7 @@
                 this.$http.get('https://ec.gorbib.org.ru/records/getrecords' + (this.query ? '/body:' + encodeURI(this.query) : '') + '/page:' + this.page)
                 .then(response => {
                     this.loading = false;
-                    this.records = response.data.records;
+                    this.records = this.records.concat(response.data.records);
                     
                     this.totalCount = response.data.total_total;
                     if (typeof this.records[0] !== 'undefined') {
@@ -241,12 +259,17 @@
                         this.resultsCount = 0;
                     } 
                 });
+            },
+            loadMore: function() {
+                this.page += 1;
+                this.getRecords();
             }
         },
         watch: {
             query: function(val) {
                 this.records = [];
                 this.resultsCount = 0;
+                this.page = 1;
                 this.getRecords();
             }
         },
@@ -265,6 +288,11 @@
                 if(d == 1)           return one;
                 if(d >= 2 && d <= 4) return few;
                 /*otherwise*/        return many;
+            }
+        },
+        computed: {
+            hasMorePages: function() {
+                return (this.page * this.recordsPerPage) < this.resultsCount;
             }
         }
     });
