@@ -27,6 +27,10 @@
         --accent-color: #8194fb;
     }
 
+    [v-cloak] {
+        display: none;
+    }
+
     #app {
         -webkit-font-smoothing: antialiased;
         display: flex;
@@ -166,10 +170,20 @@
         flex-grow: 1;
         flex-shrink: 0;
     }
+    .books-enter-active, .books-leave-active {
+        transition: all 0.4s ease-out;
+    }
+    .books-enter, .books-leave-to {
+        opacity: 0;
+    }
+
+    .books-enter-to, .books-leave {
+        opacity: 1;
+    }
     </style>
 </head>
 <body>
-    <div id="app">
+    <div id="app" v-cloak>
         <header class="topbar">
             <div class="topbar__title">Каталог книг библиотеки им. Селянина</div>
             <div class="topbar__subtitle" v-if="totalCount">{{totalCount}} {{totalCount | pluralize('книга,книги,книг')}}</div>
@@ -177,9 +191,9 @@
         <div class="layout">
             <input type="search" v-model="query" class="search-field" placeholder="Напиши название книги или имя автора">
             <div class="search-results-title" v-if="resultsCount > 0">{{resultsCount | pluralize('Найдена,Найдены,Найдено')}} {{resultsCount}} {{resultsCount | pluralize('книга,книги,книг')}}</div>
-            <div class="books-list">
-                <book :record="record" :query="query" v-for="record in records"></book>
-            </div>
+            <transition-group appear name="books" class="books-list" tag="div">
+                <book :record="record" :query="query" v-for="record in records" :key="record.id"></book>
+            </transition-group>
             <div class="splashscreen" v-if="resultsCount == 0 && !loading"><span>Книги не найдены</span></div>
             <div class="preloader" v-if="loading">
                 <svg width="120" height="30" xmlns="http://www.w3.org/2000/svg" fill="#8194fb">
