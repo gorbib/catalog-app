@@ -118,7 +118,14 @@
     }
     .book__department {
         font-size: 14px;
-        display: none;
+    }
+    .book__extra {
+        margin-top: 20px;
+        font-size: 14px;
+        font-weight: 300;
+    }
+    .book__contents {
+        margin-top: 20px;
     }
     .expands {
         display: none;
@@ -128,8 +135,6 @@
     }
     .book mark {
         background-color: var(--accent-color);
-        padding: 3px 3px;
-        margin: 2px;
         border-radius: 3px;
         color: #fff;
     }
@@ -203,7 +208,14 @@
             <div class="book__author" v-else v-html="$options.filters.highlightMatches(record.full_name, query)"></div>
             <div class="book__subtitle expands" v-if="record.title_info">{{record.title_info}}</div>
             <div class="book__summary expands" v-html="$options.filters.highlightMatches(record.summary, query)"></div>
-            <div class="book__department expands">{{record.department}}</div>
+            <div class="book__department">{{record.department}}</div>
+            <details class="book__contents" v-if="record.extra['#330'][0] !== ''">
+                <summary v-on:click.stop>Содержание</summary>
+                <ul>
+                    <li v-for="item in record.extra['#330']" v-html="$options.filters.highlightMatches(item, query)"></li>
+                </ul>
+            </details>
+            <div class="book__extra expands"><span>{{record.extra["#210"][0]}}</span> &bull; <span>{{record.extra["#621"][0]}}</span> &bull; <span>{{record.extra["#606"][0]}}</span></div>
         </div>
     </template>
 </body>
@@ -214,7 +226,7 @@
         props: ['record', 'query'],
         data: function() {
             return {
-                expanded: false,
+                expanded: false
             }
         },
         methods: {
