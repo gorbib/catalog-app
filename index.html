@@ -285,8 +285,17 @@
             getRecords: function() {
                 this.loading = true;
 
-                this.$http.get('https://ec.gorbib.org.ru/records/getrecords' + (this.query ? '/body:' + encodeURI(this.query) : '') + '/page:' + this.page)
-                .then(response => {
+                this.$http.get(
+                    'https://ec.gorbib.org.ru/records/getrecords' + (this.query ? '/body:' + encodeURI(this.query) : '') + '/page:' + this.page,
+                    // abot previous request
+                    {
+                        before(request) {
+                            if (this.previousRequest) {
+                                this.previousRequest.abort();
+                            }
+                            this.previousRequest = request;
+                        }
+                }).then(response => {
                     this.loading = false;
                     this.records = this.records.concat(response.data.records);
                     
