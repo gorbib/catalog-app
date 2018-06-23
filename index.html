@@ -221,7 +221,7 @@
             <div class="book__title" v-html="$options.filters.highlightMatches(record.title, query)"></div>
             <div class="book__author" v-if="this.expanded" v-html="$options.filters.highlightMatches(record.author, query)"></div>
             <div class="book__author" v-else v-html="$options.filters.highlightMatches(record.full_name, query)"></div>
-            <div class="book__subtitle expands" v-if="record.title_info">{{record.title_info}}</div>
+            <div class="book__subtitle expands" v-if="record.title_info">{{record.title_info}}<template v-if="record.extra['#215']">, {{record.extra['#215']}}</template></div>
             <div class="book__summary expands" v-html="$options.filters.highlightMatches(record.summary, query)"></div>
             <div class="book__department">{{record.department}}</div>
             <details class="book__contents" v-if="record.extra['#330'][0] !== ''">
