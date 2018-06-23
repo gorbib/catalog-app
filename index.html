@@ -223,7 +223,7 @@
             <div class="book__author" v-else v-html="$options.filters.highlightMatches(record.full_name, query)"></div>
             <div class="book__subtitle expands" v-if="record.title_info">{{record.title_info}}<template v-if="record.extra['#215']">, {{record.extra['#215']}}</template></div>
             <div class="book__summary expands" v-html="$options.filters.highlightMatches(record.summary, query)"></div>
-            <div class="book__department">{{record.department}}</div>
+            <div class="book__department">{{department}}</div>
             <details class="book__contents" v-if="record.extra['#330'][0] !== ''">
                 <summary v-on:click.stop>Содержание</summary>
                 <ul>
@@ -254,6 +254,12 @@
                 if (!searchTerm) return string;
                 if (!string) return;
                 return string.replace(new RegExp("(" + searchTerm + ")", "ig"), "<mark>$1</mark>");
+            }
+        },
+        computed: {
+            department: function() {
+                // Unique strings
+                return this.record.department.split(', ').filter((el, i, a) => i === a.indexOf(el)).join(', ');
             }
         }
     });
