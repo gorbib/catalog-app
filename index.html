@@ -307,6 +307,9 @@
                     } else {
                         this.resultsCount = 0;
                     } 
+                },
+                error => {
+                    // Do nothing. Most of network errors brcause we abort requests
                 });
             },
             loadMore: function() {
