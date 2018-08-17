@@ -193,7 +193,7 @@
             <div class="topbar__subtitle" v-if="totalCount">{{totalCount | localizeNumber}} {{totalCount | pluralize('книга,книги,книг')}}</div>
         </header>
         <div class="layout">
-            <input type="search" v-model="query" class="search-field" placeholder="Напиши название книги или имя автора">
+            <input type="search" v-model="query" class="search-field" placeholder="Книга или автор">
             <div class="search-results-title" v-if="resultsCount > 0">{{resultsCount | pluralize('Найдена,Найдены,Найдено')}} {{resultsCount | localizeNumber}} {{resultsCount | pluralize('книга,книги,книг')}}</div>
             <transition-group appear name="books" class="books-list" tag="div">
                 <book :record="record" :query="query" v-for="record in records" :key="record.id"></book>
