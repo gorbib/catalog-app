@@ -336,11 +336,19 @@
                 var few = values[1];
                 var many = values[2];
 
-                var d = parseInt(n.toString().substr(-1));
-                if(n > 10 && n < 20) return many;
-                if(d == 1)           return one;
-                if(d >= 2 && d <= 4) return few;
-                /*otherwise*/        return many;
+                n = Math.abs(n);
+                n %= 100;
+                if (n >= 5 && n <= 20) {
+                    return many;
+                }
+                n %= 10;
+                if (n === 1) {
+                    return one;
+                }
+                if (n >= 2 && n <= 4) {
+                    return few;
+                }
+                return many;
             }
         },
         computed: {
