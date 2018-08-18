@@ -189,7 +189,7 @@
 <body>
     <div id="app" v-cloak>
         <header class="topbar">
-            <div class="topbar__title">Каталог книг библиотеки им. Селянина</div>
+            <div class="topbar__title">Каталог книг библиотеки им.&nbsp;Селянина</div>
             <div class="topbar__subtitle" v-if="totalCount">{{totalCount | localizeNumber}} {{totalCount | pluralize('книга,книги,книг')}}</div>
         </header>
         <div class="layout">
@@ -290,7 +290,7 @@
 
                 this.$http.get(
                     'https://ec.gorbib.org.ru/records/getrecords' + (this.query ? '/body:' + encodeURI(this.query) : '') + '/page:' + this.page,
-                    // abot previous request
+                    // abort previous request
                     {
                         before(request) {
                             if (this.previousRequest) {
